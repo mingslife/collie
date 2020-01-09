@@ -1,31 +1,39 @@
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
-const properties = require('properties')
-const yaml = require('js-yaml')
+const ini = require('ini')
 const findUp = require('find-up')
 
-const configPath = findUp.sync(['.collie', '.collie.yaml'])
-const config = configPath ? yaml.safeLoad(fs.readFileSync(configPath)) : {}
+const constants = require('../constants')
 
-function initConfig() {}
+const configInterface = {}
 
-function getConfig() {}
+const userConfigPath = path.join(os.homedir(), constants.USER_CONFIG_NAME)
+const userConfig = fs.existsSync(userConfigPath) ? ini.parse(fs.readFileSync(userConfigPath, 'utf-8')) : {}
+Object.freeze(userConfig)
 
-function setConfig() {}
+const projectConfigPath = findUp.sync(constants.PROJECT_CONFIG_NAMES)
+const projectConfig = projectConfigPath ? JSON.parse(fs.readFileSync(projectConfigPath, 'utf-8')) : {}
 
-module.exports = (() => {
-  const userConfigPath = path.join(os.homedir(), '.collierc')
-  if (fs.existsSync(userConfigPath)) {
-    properties.parse(userConfigPath, { path: true }, (err, obj) => {
-      console.log(obj)
-    })
-  }
+configInterface.getUserConfig = (key) => {
+  return userConfig[key]
+}
+configInterface.getProjectConfig = (key) => {
+  return projectConfig[key]
+}
+configInterface.isProjectConfigEmpty = () => {
+  return Object.keys(projectConfig).length === 0
+}
+configInterface.initProjectConfig = (packagesPath = constants.DEFAULT_PACKAGES_PATH) => {
+  fs.writeFileSync(constants.PROJECT_CONFIG_NAMES[0], JSON.stringify({
+    path: packagesPath,
+    packages: {}
+  }, null, 2))
+}
 
-  const projectConfigPath = findUp.sync(['.collie', '.collie.yaml'])
-  const projectConfig = projectConfigPath ? yaml.safeLoad(fs.readFileSync(projectConfigPath)) : {}
+module.exports = argv => {
+  Object.freeze(configInterface)
+  argv.$config = configInterface
 
-  console.log(path.join(os.homedir(), '.collierc'))
-
-  return argv => argv.config = config
-})()
+  return {}
+}

@@ -1,5 +1,3 @@
-const chalk = require('chalk')
-
 module.exports = {
   command: 'install [package]',
   aliases: ['catch', 'get', 'add'],
@@ -14,8 +12,9 @@ module.exports = {
       alias: 'package'
     }
   },
-  handler (argv) {
-    console.log(argv)
-    console.log(chalk.blue(`install ${argv.package}`))
+  async handler (argv) {
+    console.log(`install ${argv.package}`)
+    packageData = await argv.$registry.getPackageData(argv.packageName)
+    console.log(packageData)
   }
 }
