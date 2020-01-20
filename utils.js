@@ -9,11 +9,11 @@ function online() {
 }
 
 function getLocalRegistry() {
-  return path.join(os.homedir(), constants.config.DEFAULT_LOCAL, 'packages')
+  return path.join(os.homedir(), constants.config.DEFAULT_LOCAL_REGISTRY, 'packages')
 }
 
 function getRemoteRegistry() {
-  return constants.config.DEFAULT_REGISTRY
+  return constants.config.DEFAULT_REMOTE_REGISTRY
 }
 
 function getFullReleasePath(path, fromRemoteRegistry = false) {
