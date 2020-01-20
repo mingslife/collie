@@ -3,8 +3,7 @@ const constants = {
   DEFAULT_PROJECT_CONFIG_NAMES: ['.collie.json', '.collie', 'collie.json', 'collie'],
   DEFAULT_LOCAL_PATH: '.collie',
   DEFAULT_REMOTE_REGISTRY: 'http://localhost:26553/',
-  DEFAULT_PATH: 'collie_packages',
-  DEFAULT_PACKAGES: {}
+  DEFAULT_PACKAGES_PATH: 'collie_packages'
 }
 
 Object.freeze(constants)
