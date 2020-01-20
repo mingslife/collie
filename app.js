@@ -2,8 +2,8 @@ const yargs = require('yargs')
 
 const registry = require('./middleware/registry')
 
-const config = require('./config')()
-const models = require('./models')({
+const config = require('./lib/config')()
+const models = require('./lib/models')({
   localPath: config.localPath,
   remoteRegistry: config.remoteRegistry
 })
