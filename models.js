@@ -235,9 +235,9 @@ async function getPackage(packageName, offline = false) {
   return new Package(repo, name, localMetadata, remoteMetadata)
 }
 
-module.exports = (localPath, remoteRegistry) => {
-  config.localPath = localPath || constants.DEFAULT_LOCAL_PATH
-  config.remoteRegistry = remoteRegistry || constants.DEFAULT_REMOTE_REGISTRY
+module.exports = options => {
+  config.localPath = options.localPath || constants.DEFAULT_LOCAL_PATH
+  config.remoteRegistry = options.remoteRegistry || constants.DEFAULT_REMOTE_REGISTRY
 
   return {
     getPackage
