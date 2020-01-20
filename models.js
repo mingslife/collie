@@ -5,7 +5,57 @@ const compressing = require('compressing')
 const axios = require('axios')
 const hash = require('crypto').createHash('sha256')
 
-const utils = require('./utils')
+const constants = require('./constants')
+
+const config = {
+  localPath: null,
+  remoteRegistry: null
+}
+
+function getLocalRegistry() {
+  return path.join(os.homedir(), config.localPath, 'packages')
+}
+
+function getRemoteRegistry() {
+  return config.remoteRegistry
+}
+
+function getFullReleasePath(path, fromRemoteRegistry = false) {
+  if (fromRemoteRegistry) {
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path
+    } else {
+      return getRemoteRegistry() + (path.startsWith('/') ? '' : '/') + path
+    }
+  } else {
+    if (path.startsWith('/')) {
+      return path
+    } else {
+      return getLocalRegistry() + path
+    }
+  }
+}
+
+function getLatestVersion(version1, version2) {
+  if (version1 === version2) {
+    return version1
+  }
+
+  let parts1 = version1.split('.').map(x => Number(x))
+  let parts2 = version2.split('.').map(x => Number(x))
+  if (parts1.length !== 3 || parts2.length !== 3) {
+    console.error('Invalid version')
+    return null
+  }
+
+  for (let i = 0; i < 3; i++) {
+    if (parts1[i] === parts2[i]) {
+      continue
+    }
+
+    return parts1[i] > parts2[i] ? version1 : version2
+  }
+}
 
 class Release {
   packageObj
@@ -29,14 +79,14 @@ class Release {
   }
 
   async download (targetPath) {
-    let localPackagePath = path.join(utils.getLocalRegistry(), this.repo, this.name)
+    let localPackagePath = path.join(getLocalRegistry(), this.repo, this.name)
     if (!fs.existsSync(localPackagePath)) {
       mkdirp.sync(localPackagePath)
     }
     let localReleasePath = path.join(localPackagePath, `${this.version}.tgz`)
 
     if (!this.fromCache) {
-      let remoteReleaseUrl = utils.getFullReleasePath(this.path, true)
+      let remoteReleaseUrl = getFullReleasePath(this.path, true)
       
       // download
       let response = await axios({
@@ -118,11 +168,11 @@ class Package {
   getLatestRelease () {
     let localVersions = Object.keys(this.releaseMap['local'])
     let localLatestVersion = localVersions.length === 0 ? '0.0.0' : localVersions.reduce(
-      (x, y) => utils.getLatestVersion(x, y)
+      (x, y) => getLatestVersion(x, y)
     )
     let remoteVersions = Object.keys(this.releaseMap['remote'])
     let remoteLatestVersion = remoteVersions.length === 0 ? '0.0.0' : remoteVersions.reduce(
-      (x, y) => utils.getLatestVersion(x, y)
+      (x, y) => getLatestVersion(x, y)
     )
     return localLatestVersion === remoteLatestVersion ? this.releaseMap['local'][localLatestVersion] : this.releaseMap['remote'][remoteLatestVersion]
   }
@@ -169,13 +219,13 @@ function getRepoAndName(packageName) {
 async function getPackage(packageName, offline = false) {
   let { repo, name } = getRepoAndName(packageName)
 
-  let localMetadataPath = path.join(utils.getLocalRegistry(), repo, name, 'metadata.json')
+  let localMetadataPath = path.join(getLocalRegistry(), repo, name, 'metadata.json')
   let localMetadata = {}
   if (fs.existsSync(localMetadataPath)) {
     localMetadata = JSON.parse(fs.readFileSync(localMetadataPath, 'utf8'))
   }
 
-  let remoteMetadataUrl = `${utils.getRemoteRegistry()}/packages/${repo}/${name}/metadata.json`
+  let remoteMetadataUrl = `${getRemoteRegistry()}/packages/${repo}/${name}/metadata.json`
   let remoteMetadata = {}
   if (!offline) {
     let response = await axios.get(remoteMetadataUrl)
@@ -185,13 +235,11 @@ async function getPackage(packageName, offline = false) {
   return new Package(repo, name, localMetadata, remoteMetadata)
 }
 
-// getPackage('bootstrap').then(package => {
-//   console.info(package)
-//   console.info(package.getLatestRelease())
-//   console.info(package.getRelease('3.4.1'))
-//   package.getLatestRelease().download('/Users/01367473/Workspaces/Mingslife/Elf/collie/.collie')
-// })
+module.exports = (localPath, remoteRegistry) => {
+  config.localPath = localPath || constants.config.DEFAULT_LOCAL_PATH
+  config.remoteRegistry = remoteRegistry || constants.config.DEFAULT_REMOTE_REGISTRY
 
-module.exports = {
-  getPackage
+  return {
+    getPackage
+  }
 }
