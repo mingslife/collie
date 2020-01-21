@@ -4,7 +4,8 @@ const yargs = require('yargs')
 const config = require('./lib/config')()
 const models = require('./lib/models')({
   localPath: config.localPath,
-  remoteRegistry: config.remoteRegistry
+  remoteRegistry: config.remoteRegistry,
+  packagesPath: config.packagesPath
 })
 
 yargs

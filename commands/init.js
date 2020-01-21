@@ -9,12 +9,9 @@ module.exports = {
     }
   },
   async handler (argv) {
-    if (!argv.$config.isProjectConfigEmpty()) {
-      console.error('You had already initialized your project.')
-      process.exit(1)
-    } else {
-      argv.$config.initProjectConfig(argv.packagesPath)
-      console.log('Project is initialized successfully.')
+    if (argv.packagesPath) {
+      argv.context.config.projectConfig.packagesPath = argv.packagesPath
     }
+    argv.context.config.projectConfig.updateConfig()
   }
 }
