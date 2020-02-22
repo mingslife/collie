@@ -1,5 +1,5 @@
 {
-  "name": "collie",
+  "name": "colliejs",
   "version": "1.0.0",
   "description": "A tiny, modern package manager for the web",
   "main": "dist/collie.js",
