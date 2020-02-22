@@ -2,9 +2,11 @@
   "name": "collie",
   "version": "0.0.1",
   "description": "A tiny, modern package manager for the web",
-  "main": "app.js",
+  "main": "dist/collie.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -28,10 +30,18 @@
   "dependencies": {
     "axios": "^0.19.1",
     "chalk": "^3.0.0",
+    "commander": "^4.1.1",
     "compressing": "^1.5.0",
     "fs-extra": "^8.1.0",
     "ini": "^1.3.5",
     "internet-available": "^1.0.0",
     "yargs": "^15.1.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^8.0.1",
+    "@types/ini": "^1.3.30",
+    "@types/node": "^13.7.0",
+    "@types/yargs": "^15.0.3",
+    "typescript": "^3.8.2"
   }
 }
