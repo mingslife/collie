@@ -1,12 +1,12 @@
 {
   "name": "collie-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A tiny, modern package manager for the web",
   "main": "dist/collie.js",
   "scripts": {
-    "build": "tsc",
+    "build": "npx tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "npm run build"
+    "release": "npm run build"
   },
   "repository": {
     "type": "git",
